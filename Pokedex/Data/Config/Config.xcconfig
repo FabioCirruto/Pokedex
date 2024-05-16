@@ -1,0 +1,10 @@
+//
+//  Config.xcconfig
+//  Pokedex
+//
+//  Created by Fabio Cirruto on 14/05/24.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+API_URL = https:$(SLASH)/pokeapi.co/api/v2/pokemon/
