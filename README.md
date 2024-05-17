@@ -1,4 +1,5 @@
 # Pokedex
+<p align="center"><img src="https://github.com/FabioCirruto/Pokedex/assets/20417501/bb5d3b51-5b9d-4ada-b170-d92b72b0c27d" alt="Screenshot" width="50%"></p>
 
 Pokedex is an iOS application that allows users to browse a list of Pokémon and by name. The app is built using clean architecture principles, with features including a clean separation of concerns, dependency injection.
 
