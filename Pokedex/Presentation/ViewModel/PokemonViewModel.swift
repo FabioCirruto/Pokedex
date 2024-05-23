@@ -37,9 +37,21 @@ class PokemonViewModel {
             let list = try await useCase.getPokemonList(limit: perPage, offset: offSet)
             self.nextPage = list.next
             self.page += 1
-            for info in list.results {
-                Task {
-                    await getPokemon(info: info)
+            
+            let _ = await withTaskGroup(of: PokemonUI?.self, returning: [PokemonUI?].self) { taskGroup in
+
+                for info in list.results {
+                    taskGroup.addTask { await self.getPokemon(info: info) }
+                }
+
+                return await taskGroup.reduce(into: [PokemonUI]()) { partialResult, name in
+                    if let pokemon = name {
+                        self.models.append(pokemon)
+                        DispatchQueue.main.async {
+                            self.vcReference?.tableView.reloadData()
+                        }
+                    }
+                    partialResult.append(name)
                 }
             }
         } catch (let error) {
@@ -47,13 +59,26 @@ class PokemonViewModel {
         }
     }
     
-    private func getPokemon(info: PokemonInfo) async {
+    private func getPokemon(info: PokemonInfo) async -> PokemonUI? {
         do {
+            let pokemon = try await useCase.getPokemon(url: info.detail)
+            let image: UIImage? = await UIImage.fromUrl(url: pokemon.image)
+            return PokemonUI(
+                name: pokemon.name.capitalized,
+                desc: pokemon.desc.apiFormatted,
+                types: pokemon.types.map {$0.name},
+                image: image
+            )
+        } catch (let error) {
+            print(error.localizedDescription)
+            return nil
+        }
+        /*do {
             let pokemon = try await useCase.getPokemon(url: info.detail)
             await prepareModel(pokemon: pokemon)
         } catch (let error) {
             print(error.localizedDescription)
-        }
+        }*/
     }
     
     private func prepareModel(pokemon: Pokemon) async {
